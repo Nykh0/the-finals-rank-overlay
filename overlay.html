@@ -30,7 +30,7 @@
                     fetch('https://storage.googleapis.com/embark-discovery-leaderboard/s2-leaderboard-crossplay-discovery-live.json')
                     .then(response => response.json())
                     .then(data => {
-                            let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName') + '#' + urlParams.get('embarkIdNumber'));
+                            let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
                             if (player){
                                 const diff = player.r - player.or;
                                 if (diff < 0){
@@ -114,7 +114,7 @@
                 render() {
                     const urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.get('embarkIdName') || !urlParams.get('embarkIdNumber')){
-                        return "How to use : add to the end of the url these informations : embarkIdName=YOUR_EMBARK_NAME_HERE>&embarkIdNumber=YOUR_EMBARK_NUMBER_HERE&textColor=TEXT_COLOR_HEXADECIMAL&backgroundColor=BACKGROUND_COLOR_HEXADECIMAL&fontFamily=FONT_FAMILY"
+                        return "How to use : add to the end of the url these informations : embarkIdName=YOUR_EMBARK_NAME_HERE&embarkIdNumber=YOUR_EMBARK_NUMBER_HERE&textColor=TEXT_COLOR_HEXADECIMAL_HERE&backgroundColor=BACKGROUND_COLOR_HEXADECIMAL_HERE&fontFamily=FONT_FAMILY_HERE"
                     }
                     else if (this.state.isLoading){
                         return "loading..."
