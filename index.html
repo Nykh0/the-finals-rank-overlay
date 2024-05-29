@@ -1,0 +1,202 @@
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script type="text/babel">
+            const e = React.createElement;
+            class Overlay extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = { 
+                        player: null,
+                        isLoading : true,
+                        notFound: false
+                    };
+                }
+
+                componentDidMount(){
+                    this.getInfos();
+                    setInterval(() => this.getInfos(), 120000);
+                }
+
+                getInfos(){
+                    const urlParams = new URLSearchParams(window.location.search);
+
+                    this.setState({
+                        isLoading: true
+                    });
+                    fetch('https://storage.googleapis.com/embark-discovery-leaderboard/s2-leaderboard-crossplay-discovery-live.json')
+                    .then(response => response.json())
+                    .then(data => {
+                            let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
+                            if (player){
+                                const diff = player.r - player.or;
+                                if (diff < 0){
+                                    player.classDiff = "positive";
+                                    player.diff = diff.toString().replace("-","+");
+                                } else if (diff > 0) {
+                                    player.classDiff = "negative";
+                                    player.diff = "-" + diff;
+                                } else {
+                                    player.classDiff = "zero";
+                                    player.diff = "0";
+                                }
+                                player.nameRank = this.getFame(player);
+                                player.imgRankName = player.nameRank.toLowerCase().replace(" ", "-").concat("-thumb.png");
+
+                                this.setState({
+                                    player: player,
+                                    isLoading: false,
+                                    notFound: false
+                                })
+                                
+                            } else {
+                                this.setState({
+                                    player: null,
+                                    isLoading: false,
+                                    notFound: true
+                                })
+                            }
+                        });
+                }
+
+                getFame(player) {
+                switch (player.ri) {
+                    case 0:
+                        return "Unranked";
+                    case 1:
+                        return "Bronze 4";
+                    case 2:
+                        return "Bronze 3";
+                    case 3:
+                        return "Bronze 2";
+                    case 4:
+                        return "Bronze 1";
+                    case 5:
+                        return "Silver 4";
+                    case 6:
+                        return "Silver 3";
+                    case 7:
+                        return "Silver 2";
+                    case 8:
+                        return "Silver 1";
+                    case 9:
+                        return "Gold 4";
+                    case 10:
+                        return "Gold 3";
+                    case 11:
+                        return "Gold 2";
+                    case 12:
+                        return "Gold 1";
+                    case 13:
+                        return "Platinum 4";
+                    case 14:
+                        return "Platinum 3";
+                    case 15:
+                        return "Platinum 2";
+                    case 16:
+                        return "Platinum 1";
+                    case 17:
+                        return "Diamond 4";
+                    case 18:
+                        return "Diamond 3";
+                    case 19:
+                        return "Diamond 2";
+                    case 20:
+                        return "Diamond 1";
+                    default:
+                        return "Unknown Rank";
+                    }
+            }
+
+                render() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (!urlParams.get('embarkIdName') || !urlParams.get('embarkIdNumber')){
+                        return "How to use : add to the end of the url these informations : embarkIdName=YOUR_EMBARK_NAME_HERE&embarkIdNumber=YOUR_EMBARK_NUMBER_HERE&textColor=TEXT_COLOR_HEXADECIMAL_HERE&backgroundColor=BACKGROUND_COLOR_HEXADECIMAL_HERE&fontFamily=FONT_FAMILY_HERE"
+                    }
+                    else if (this.state.isLoading){
+                        return "loading..."
+                    }
+                    return (<div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
+                        <div className="imageLeague"><img src={"https://storage.googleapis.com/embark-discovery-leaderboard/img/thumbs/" + this.state.player.imgRankName}/></div>
+                        <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + urlParams.get("backgroundColor")}}>
+                            <div className="league">{this.state.player.nameRank}</div>
+                            <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
+                            <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player.diff}</div>
+                        </div>
+                    </div>)
+                }
+            }
+            const domContainer = document.querySelector('#container');
+            const root = ReactDOM.createRoot(domContainer);
+            root.render(e(Overlay));
+        </script>
+    </body>
+    <style>
+        div#container {
+            display: flex;
+            font-family: Arial;
+            font-size: 22px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .imageLeague img {
+            width: 160px;
+            display: block;
+            position: absolute;
+            z-index: 1;
+            top: 0px;
+        }
+        .componentBase {
+            display: flex;
+            align-items: center;
+        }
+
+        .infos {
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            left: 60px;
+            border-style: solid;
+            background-color: white;
+            border-color: white;
+            border-right-width: 10px;
+            border-radius: 30px;
+            padding-left: 90px;
+            top: 25px;
+            left: 60px;
+        }
+
+        .rank {
+            display: inline-flex;
+            font-size: 40px;
+            margin-left: 3px;
+        }
+
+        .positive, .negative {
+            display: inline-flex;
+            margin-left: 28px;
+            font-size: 40px;
+        }
+
+        .league{
+            font-size: 50px;
+        }
+
+        .desc{
+            font-size: 20px;
+            margin-top: 17px;
+            margin-right: 5px;
+        }
+    </style>
+    
+</html>
