@@ -109,7 +109,7 @@
                     return (
                         <div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
                             <div className="imageLeague"><img src={"https://storage.googleapis.com/embark-discovery-leaderboard/img/thumbs/" + this.state.player.imgRankName}/></div>
-                            <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + urlParams.get("borderColor")}}>
+                            <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + urlParams.get("borderColor"), borderWidth: urlParams.get("borderWidth") + "px"}}>
                                 <div className="league">{this.state.player.nameRank}</div>
                                 <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
                                 <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player.diff}</div>
@@ -172,8 +172,8 @@
         .league{
             font-size: 50px;
             margin-right: 10px;
-            text-align: center;
             min-width: 300px;
+            line-height: 60px;
         }
 
         .desc{
