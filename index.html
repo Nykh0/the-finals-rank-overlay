@@ -32,9 +32,17 @@
                     this.setState({
                         isLoading: true
                     });
-                    fetch('https://storage.googleapis.com/embark-discovery-leaderboard/s2-leaderboard-crossplay-discovery-live.json')
+                    let headers = new Headers();
+
+                    headers.append('Content-Type', 'application/json');
+                    headers.append('Accept', 'application/json');
+
+                    headers.append('Access-Control-Allow-Origin', '*');
+                    headers.append('Access-Control-Allow-Credentials', 'true');
+                    fetch('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/ranked.json?slug=ranked', { headers: headers, credentials: 'include'})
                     .then(response => response.json())
-                    .then(data => {
+                    .then(fullJson => {
+                        const data = fullJson.pageProps.entries;
                         let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
                         if (player){
                             const diff = player.r - player.or;
