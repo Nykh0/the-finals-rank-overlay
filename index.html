@@ -39,7 +39,7 @@
 
                     headers.append('Access-Control-Allow-Origin', '*');
                     headers.append('Access-Control-Allow-Credentials', 'true');
-                    fetch('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/ranked.json?slug=ranked', { headers: headers, credentials: 'include'})
+                    fetch('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/ranked.json?slug=ranked', { mode: 'no-cors', headers: headers, credentials: 'include'})
                     .then(response => response.json())
                     .then(fullJson => {
                         const data = fullJson.pageProps.entries;
