@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script type="text/babel">
+            const e = React.createElement;
+            class Overlay extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        player: null,
+                        isLoading : true,
+                        notFound: false
+                    };
+                }
+
+                componentDidMount() {
+                    this.getInfos();
+                    setInterval(() => this.getInfos(), 120000);
+                }
+
+                getInfos() {
+                    const urlParams = new URLSearchParams(window.location.search);
+
+                    this.setState({
+                        isLoading: true
+                    });
+                    const url = 'https://corsproxy.io/?' + encodeURIComponent('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/world-tour.json?slug=world-tour');
+                    fetch(url)
+                    .then(response => response.json())
+                    .then(fullJson => {
+                        const data = fullJson.pageProps.entries;
+                        let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
+                        if (player){
+                            this.setState({
+                                player: player,
+                                isLoading: false,
+                                notFound: false
+                            })
+                        } else {
+                            this.setState({
+                                player: null,
+                                isLoading: false,
+                                notFound: true
+                            })
+                        }
+                    });
+                }
+
+                getName(player){
+                    if (player.steam) {
+                        return player.steam;
+                    }
+                    else if (player.psn) {
+                        return player.psn;
+                    }
+                    else if (player.xbox) {
+                        return player.xbox;
+                    }
+                    else return player.name;
+                }
+
+                render() {
+                    const formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                    });
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (!urlParams.get('embarkIdName') || !urlParams.get('embarkIdNumber')){
+                        return "How to use : add to the end of the url these informations : embarkIdName=YOUR_EMBARK_NAME_HERE&embarkIdNumber=YOUR_EMBARK_NUMBER_HERE&textColor=TEXT_COLOR_HEXADECIMAL_HERE&backgroundColor=BACKGROUND_COLOR_HEXADECIMAL_HERE&fontFamily=FONT_FAMILY_HERE"
+                    }
+                    else if (this.state.isLoading) {
+                        return "loading..."
+                    }
+                    return (
+                        <div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
+                            <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + (urlParams.get("borderColor") ? urlParams.get("borderColor") : urlParams.get("backgroundColor")), borderWidth: urlParams.get("borderWidth") ? urlParams.get("borderWidth") + "px" : "0"}}>
+                                <div className="cash">{formatter.format(this.state.player.p)}</div>
+                                <div className="description"><span className="desc">Rank</span> {this.state.player.r}<span className="desc right-desc">Name</span> {this.getName(this.state.player)}</div>
+                            </div>
+                        </div>
+                    )
+                }
+            }
+            const domContainer = document.querySelector('#container');
+            const root = ReactDOM.createRoot(domContainer);
+            root.render(e(Overlay));
+        </script>
+    </body>
+    <style>
+        div#container {
+            display: flex;
+            font-family: Arial;
+            font-size: 22px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .imageLeague img {
+            width: 160px;
+            display: block;
+            position: absolute;
+            z-index: 1;
+            top: 0px;
+        }
+        .componentBase {
+            display: flex;
+            align-items: center;
+        }
+
+        .infos {
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            border-style: solid;
+            background-color: white;
+            border-color: white;
+            border-radius: 30px;
+            padding-left: 10px;
+            top: 25px;
+            left: 60px;
+        }
+
+        .description {
+            display: inline-flex;
+            font-size: 40px;
+            margin-left: 3px;
+        }
+
+        .positive, .negative {
+            display: inline-flex;
+            margin-left: 28px;
+            font-size: 40px;
+        }
+
+        .cash{
+            font-size: 50px;
+            margin-right: 10px;
+            line-height: 60px;
+        }
+
+        .desc{
+            font-size: 20px;
+            margin-top: 17px;
+            margin-right: 5px;
+        }
+
+        .right-desc{
+            margin-left: 20px;
+        }
+    </style>
+</html>
