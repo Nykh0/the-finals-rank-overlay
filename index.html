@@ -32,16 +32,6 @@
                     this.setState({
                         isLoading: true
                     });
-                    let headers = new Headers();
-
-                    headers.append('Content-Type', 'application/json');
-                    headers.append('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7');
-
-                    headers.append("Access-Control-Allow-Origin", "https://example.com")
-                    headers.append('Access-Control-Allow-Credentials', 'true');
-                    headers.append('Accept-Language', 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,de;q=0.6,it;q=0.5');
-                    headers.append('Referrer-Policy', 'no-referrer');
-                    headers.append("Access-Control-Allow-Headers", "content-type, allow-credentials")
                     const url = 'https://corsproxy.io/?' + encodeURIComponent('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/ranked.json?slug=ranked');
                     fetch(url)
                     .then(response => response.json())
@@ -60,8 +50,8 @@
                                 player.classDiff = "zero";
                                 player.diff = "0";
                             }
-                            player.nameRank = this.getFame(player);
-                            player.imgRankName = player.nameRank.toLowerCase().replace(" ", "-").concat("-thumb.png");
+                            player.nameRank = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].label;
+                            player.imgRankName = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].imagePath;
 
                             this.setState({
                                 player: player,
@@ -78,38 +68,6 @@
                     });
                 }
 
-                getFame(player) {
-                    const rankTitles = [
-                        "Unranked",
-                        "Bronze 4",
-                        "Bronze 3",
-                        "Bronze 2",
-                        "Bronze 1",
-                        "Silver 4",
-                        "Silver 3",
-                        "Silver 2",
-                        "Silver 1",
-                        "Gold 4",
-                        "Gold 3",
-                        "Gold 2",
-                        "Gold 1",
-                        "Platinum 4",
-                        "Platinum 3",
-                        "Platinum 2",
-                        "Platinum 1",
-                        "Diamond 4",
-                        "Diamond 3",
-                        "Diamond 2",
-                        "Diamond 1",
-                    ];
-
-                    if (player.ri >= 0 && player.ri < rankTitles.length) {
-                        return rankTitles[player.ri];
-                    } else {
-                        return "Unknown Rank";
-                    }
-                }
-
                 render() {
                     const urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.get('embarkIdName') || !urlParams.get('embarkIdNumber')){
@@ -120,7 +78,7 @@
                     }
                     return (
                         <div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
-                            <div className="imageLeague"><img src={"https://storage.googleapis.com/embark-discovery-leaderboard/img/thumbs/" + this.state.player.imgRankName}/></div>
+                            <div className="imageLeague"><img src={"https://id.embark.games" + this.state.player.imgRankName}/></div>
                             <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + urlParams.get("borderColor") ? urlParams.get("borderColor") : urlParams.get("backgroundColor"), borderWidth: urlParams.get("borderWidth") ? urlParams.get("borderWidth") + "px" : "0"}}>
                                 <div className="league">{this.state.player.nameRank}</div>
                                 <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
