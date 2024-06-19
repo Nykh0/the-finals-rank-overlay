@@ -32,40 +32,52 @@
                     this.setState({
                         isLoading: true
                     });
-                    const url = 'https://corsproxy.io/?' + encodeURIComponent('https://id.embark.games/_next/data/B-lkaPSkbNrJQwY3fq9CX/en/leaderboards/ranked.json?slug=ranked');
+                    const url = 'https://corsproxy.io/?' + encodeURIComponent('https://id.embark.games/leaderboards/ranked');
                     fetch(url)
-                    .then(response => response.json())
-                    .then(fullJson => {
-                        const data = fullJson.pageProps.entries;
-                        let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
-                        if (player){
-                            const diff = player.r - player.or;
-                            if (diff < 0) {
-                                player.classDiff = "positive";
-                                player.diff = diff.toString().replace("-","+");
-                            } else if (diff > 0) {
-                                player.classDiff = "negative";
-                                player.diff = "-" + diff;
-                            } else {
-                                player.classDiff = "zero";
-                                player.diff = "0";
-                            }
-                            player.nameRank = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].label;
-                            player.imgRankName = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].imagePath;
-
-                            this.setState({
-                                player: player,
-                                isLoading: false,
-                                notFound: false
-                            })
-                        } else {
-                            this.setState({
-                                player: null,
-                                isLoading: false,
-                                notFound: true
-                            })
+                    .then(response => response.text())
+                    .then(fullText => {
+                        //Inspired on @leonlarsson work here : https://github.com/leonlarsson/the-finals-api/blob/main/src/utils/fetchers/fetchS3WorldTourData.ts
+                        let stringData = fullText.match(/<script id="__NEXT_DATA__" type="application\/json">(.*)<\/script>/)[1];
+                        if (!stringData) {
+                            return null;
                         }
-                    });
+                        try {
+                            stringData = stringData.split("\x3C/script>")[0];
+                            const fullJson = JSON.parse(stringData).props;
+                            const data = fullJson.pageProps.entries;
+                            let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
+                            if (player){
+                                const diff = player.r - player.or;
+                                if (diff < 0) {
+                                    player.classDiff = "positive";
+                                    player.diff = diff.toString().replace("-","+");
+                                } else if (diff > 0) {
+                                    player.classDiff = "negative";
+                                    player.diff = "-" + diff;
+                                } else {
+                                    player.classDiff = "zero";
+                                    player.diff = "0";
+                                }
+                                player.nameRank = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].label;
+                                player.imgRankName = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].imagePath;
+
+                                this.setState({
+                                    player: player,
+                                    isLoading: false,
+                                    notFound: false
+                                })
+                            } else {
+                                this.setState({
+                                    player: null,
+                                    isLoading: false,
+                                    notFound: true
+                                })
+                            }
+                        } catch (error) {
+                            console.log("Error in fetching s3 ranked informations :", error);
+                            return null;
+                        }
+                        });
                 }
 
                 render() {
