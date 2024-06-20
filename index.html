@@ -32,7 +32,7 @@
                     this.setState({
                         isLoading: true
                     });
-                    const url = 'https://corsproxy.io/?' + encodeURIComponent('https://id.embark.games/leaderboards/ranked');
+                    const url = 'http://127.0.0.1:3001/' + 'https://id.embark.games/leaderboards/ranked';
                     fetch(url)
                     .then(response => response.text())
                     .then(fullText => {
@@ -77,7 +77,7 @@
                             console.log("Error in fetching s3 ranked informations :", error);
                             return null;
                         }
-                        });
+                    });
                 }
 
                 render() {
@@ -95,6 +95,7 @@
                                 <div className="league">{this.state.player.nameRank}</div>
                                 <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
                                 <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player.diff}</div>
+                                <div className="points"><span className="desc">Points</span> {this.state.player.p}</div>
                             </div>
                         </div>
                     )
@@ -115,11 +116,12 @@
         }
 
         .imageLeague img {
-            width: 160px;
+            width: 230px;
             display: block;
             position: absolute;
             z-index: 1;
-            top: 0px;
+            top: -9px;
+            left: -10px;
         }
         .componentBase {
             display: flex;
@@ -136,11 +138,16 @@
             border-radius: 30px;
             padding-left: 90px;
             top: 25px;
-            left: 60px;
+            left: 90px;
         }
 
         .rank {
             display: inline-flex;
+            font-size: 40px;
+            margin-left: 3px;
+        }
+
+        .points {
             font-size: 40px;
             margin-left: 3px;
         }
