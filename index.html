@@ -92,7 +92,7 @@
                         <div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
                             <div className="imageLeague"><img src={"https://id.embark.games" + this.state.player.imgRankName}/></div>
                             <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + (urlParams.get("borderColor") ? urlParams.get("borderColor") : urlParams.get("backgroundColor")), borderWidth: urlParams.get("borderWidth") ? urlParams.get("borderWidth") + "px" : "0"}}>
-                                <div className="league">{this.state.player.nameRank}</div>
+                                <div className={this.state.player.ri > 16 ? "league-dia-min league" : "league"}>{this.state.player.nameRank}</div>
                                 <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
                                 <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player.diff}</div>
                                 <div className="points"><span className="desc">Points</span> {this.state.player.p}</div>
@@ -163,6 +163,11 @@
             margin-right: 10px;
             min-width: 300px;
             line-height: 60px;
+        }
+
+        .league-dia-min{
+            margin-left : 20px!important;
+            min-width: 280px!important;
         }
 
         .desc{
