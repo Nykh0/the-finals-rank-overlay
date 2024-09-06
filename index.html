@@ -26,12 +26,105 @@
                     setInterval(() => this.getInfos(), 120000);
                 }
 
+                getRankList(){
+                    return (
+                [{
+                    label: "Unranked",
+                    imagePath: ""
+                },
+                {
+                    label: "Bronze 4",
+                    imagePath: "bronze-4.png"
+                },
+                {
+                    label: "Bronze 3",
+                    imagePath: "bronze-3.png"
+                },
+                {
+                    label: "Bronze 2",
+                    imagePath: "bronze-2.png"
+                },
+                {
+                    label: "Bronze 1",
+                    imagePath: "bronze-1.png"
+                },
+                {
+                    label: "Silver 4",
+                    imagePath: "silver-4.png"
+                },
+                {
+                    label: "Silver 3",
+                    imagePath: "silver-3.png"
+                },
+                {
+                    label: "Silver 2",
+                    imagePath: "silver-2.png"
+                },
+                {
+                    label: "Silver 1",
+                    imagePath: "silver-1.png"
+                },
+                {
+                    label: "Gold 4",
+                    imagePath: "gold-4.png"
+                },
+                {
+                    label: "Gold 3",
+                    imagePath: "gold-3.png"
+                },
+                {
+                    label: "Gold 2",
+                    imagePath: "gold-2.png"
+                },
+                {
+                    label: "Gold 1",
+                    imagePath: "gold-1.png"
+                },
+                {
+                    label: "Platinum 4",
+                    imagePath: "platinum-4.png"
+                },
+                {
+                    label: "Platinum 3",
+                    imagePath: "platinum-3.png"
+                },
+                {
+                    label: "Platinum 2",
+                    imagePath: "platinum-2.png"
+                },
+                {
+                    label: "Platinum 1",
+                    imagePath: "platinum-1.png"
+                },
+                {
+                    label: "Diamond 4",
+                    imagePath: "diamond-4.png"
+                },
+                {
+                    label: "Diamond 3",
+                    imagePath: "diamond-3.png"
+                },
+                {
+                    label: "Diamond 2",
+                    imagePath: "diamond-2.png"
+                },
+                {
+                    label: "Diamond 1",
+                    imagePath: "diamond-1.png"
+                },
+                {
+                    label: "Ruby",
+                    imagePath: "ruby.png"
+                }]);
+            }
+
                 getInfos() {
                     const urlParams = new URLSearchParams(window.location.search);
 
                     this.setState({
                         isLoading: true
                     });
+                    const _this = this;
                     const url = 'http://nykho.fr:3001/' + 'https://id.embark.games/leaderboards/ranked';
                     fetch(url)
                     .then(response => response.text())
@@ -45,21 +138,18 @@
                             stringData = stringData.split("\x3C/script>")[0];
                             const fullJson = JSON.parse(stringData).props;
                             const data = fullJson.pageProps.entries;
-                            let player = data.find((elmt) => elmt.name.toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
+                            let player = data.find((elmt) => elmt[3].toLowerCase() === urlParams.get('embarkIdName').toLowerCase() + '#' + urlParams.get('embarkIdNumber'));
                             if (player){
-                                const diff = player.r - player.or;
-                                if (diff < 0) {
+                                if (player[2] > 0){
                                     player.classDiff = "positive";
-                                    player.diff = diff.toString().replace("-","+");
-                                } else if (diff > 0) {
+                                } else if (player[2] < 0) {
                                     player.classDiff = "negative";
-                                    player.diff = "-" + diff;
                                 } else {
                                     player.classDiff = "zero";
-                                    player.diff = "0";
                                 }
-                                player.nameRank = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].label;
-                                player.imgRankName = fullJson.pageProps.metadata.rankToLeagueMap[player.ri].imagePath;
+                                const list = _this.getRankList();
+                                player.nameRank = list[player[4]].label;
+                                player.imgRankName = list[player[4]].imagePath;
 
                                 this.setState({
                                     player: player,
@@ -80,6 +170,8 @@
                     });
                 }
 
+                
+
                 render() {
                     const urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.get('embarkIdName') || !urlParams.get('embarkIdNumber')){
@@ -90,12 +182,12 @@
                     }
                     return (
                         <div className="componentBase" style={{color: "#" + urlParams.get("textColor"), fontFamily : urlParams.get("fontFamily")}}>
-                            <div className="imageLeague"><img src={"https://id.embark.games" + this.state.player.imgRankName}/></div>
+                            <div className="imageLeague"><img src={"https://id.embark.games/images/leaderboards/leagues/" + this.state.player.imgRankName}/></div>
                             <div className="infos" style={{backgroundColor : "#" + urlParams.get("backgroundColor"), borderColor : "#" + (urlParams.get("borderColor") ? urlParams.get("borderColor") : urlParams.get("backgroundColor")), borderWidth: urlParams.get("borderWidth") ? urlParams.get("borderWidth") + "px" : "0"}}>
-                                <div className={this.state.player.ri > 16 ? "league-dia-min league" : "league"}>{this.state.player.nameRank}</div>
-                                <div className="rank"><span className="desc">Rank</span> {this.state.player.r}</div>
-                                <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player.diff}</div>
-                                <div className="points"><span className="desc">Points</span> {this.state.player.p}</div>
+                                <div className={this.state.player[4] > 16 ? "league-dia-min league" : "league"}>{this.state.player.nameRank}</div>
+                                <div className="rank"><span className="desc">Rank</span> {this.state.player[1]}</div>
+                                <div className={this.state.player.classDiff}><span className="desc">24h</span> {this.state.player[2]}</div>
+                                <div className="points"><span className="desc">Points</span> {this.state.player[5]}</div>
                             </div>
                         </div>
                     )
